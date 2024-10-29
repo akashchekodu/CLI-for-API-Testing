@@ -17,6 +17,10 @@ pub struct Cli {
     #[arg(long,short='b')]
     pub body: Option<String>,
     
+    #[arg(long, short = 'p')]
+    pub url_params: Option<String>, // New field for URL parameters
+
+    
     #[arg(long,short='a')]
     pub headers: Option<String>,
 

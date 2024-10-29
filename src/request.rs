@@ -7,8 +7,9 @@ use serde_json::Value;
 pub struct Request {
     pub method: String,
     pub url: String,
-    pub params: HashMap<String, Value>,
+    pub body: HashMap<String, Value>,
     pub headers: HashMap<String, String>, // Ensure this field exists
+    pub url_params: HashMap<String, Value>, // New field for URL parameters
 }
 
 impl Request {
@@ -39,20 +40,20 @@ impl Request {
     }
 
     // Parse GET parameters if needed (implement if required)
-    // pub fn parse_get(input: &str) -> HashMap<String, Value> {
-    //     let mut map = HashMap::new();
-    //     // Implement parsing logic for query parameters here, if applicable
-    //     // Example: Split input by '&' and extract key-value pairs
-    //     for pair in input.split('&') {
-    //         let parts: Vec<&str> = pair.split('=').collect();
-    //         if parts.len() == 2 {
-    //             let key = parts[0].to_string();
-    //             let value = Value::String(parts[1].to_string());
-    //             map.insert(key, value);
-    //         }
-    //     }
-    //     map
-    // }
+    pub fn parse_get(input: &str) -> HashMap<String, Value> {
+        let mut map = HashMap::new();
+        // Implement parsing logic for query parameters here, if applicable
+        // Example: Split input by '&' and extract key-value pairs
+        for pair in input.split('&') {
+            let parts: Vec<&str> = pair.split('=').collect();
+            if parts.len() == 2 {
+                let key = parts[0].to_string();
+                let value = Value::String(parts[1].to_string());
+                map.insert(key, value);
+            }
+        }
+        map
+    }
 
     pub fn parse_headers(input: &str) -> HashMap<String, String> {
         let mut headers = HashMap::new();
@@ -67,22 +68,29 @@ impl Request {
         headers
     }
 
-    pub fn new(method: &str, url: &str, json_arg: Option<&str>, headers_arg: Option<&str>) -> Result<Self, String> {
-        let params = if method.eq_ignore_ascii_case("GET") {
-         HashMap::new()
-        } else if let Some(json) = json_arg {
+    pub fn new(method: &str, url: &str, body_arg: Option<&str>, url_params_arg: Option<&str>, headers_arg: Option<&str>) -> Result<Self, String> {
+        let url_params = url_params_arg.map_or_else(HashMap::new, |p| Self::parse_custom_json(p).unwrap_or_default());
+
+        let body = if method.eq_ignore_ascii_case("GET") {
+            HashMap::new()
+        } else if let Some(json) = body_arg {
             Self::parse_custom_json(json)?
         } else {
             HashMap::new()
         };
+
+        // Combine body parameters with URL parameters
+        let mut combined_params = url_params.clone();
+        combined_params.extend(url_params.clone());
 
         let headers = headers_arg.map_or_else(HashMap::new, |h| Self::parse_headers(h));
 
         Ok(Request {
             method: method.to_string(),
             url: url.to_string(),
-            params,
+            body,
             headers,
+            url_params : combined_params,
         })
     }
 }

@@ -14,7 +14,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args = Cli::parse();
 
     // Attempt to create a Request object from the parsed CLI arguments
-    match Request::new(&args.method, &args.url, args.body.as_deref(), args.headers.as_deref()) {
+    match Request::new(&args.method, &args.url, args.body.as_deref(), args.headers.as_deref(), args.url_params.as_deref()) {
         Ok(request) => {
             println!("Parsed Request: {:?}", request);
 
@@ -42,17 +42,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
             let res = if request.method.eq_ignore_ascii_case("GET") {
                 request_builder.send().await?
             } else {
-                request_builder.json(&request.params).send().await?
+                request_builder.json(&request.body).send().await?
             };
 
             // Handle the response
             handle_response(res).await?;
 
             // Example of accessing specific fields in the parameters
-            if let Some(field1) = request.params.get("field1") {
+            if let Some(field1) = request.body.get("field1") {
                 println!("Field1: {:?}", field1);
             }
-            if let Some(field2) = request.params.get("field2") {
+            if let Some(field2) = request.body.get("field2") {
                 println!("Field2: {:?}", field2);
             }
         }
