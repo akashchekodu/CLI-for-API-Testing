@@ -13,4 +13,7 @@ pub struct Cli {
 
     /// JSON-like string with request parameters
     pub json: Option<String>,
+
+    pub headers: Option<String>,
+
 }
