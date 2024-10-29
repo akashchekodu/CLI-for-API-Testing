@@ -1,4 +1,4 @@
-# Rust API Testing CLI
+# RequestCLI : Rust API Testing CLI
 
 ## Overview
 
