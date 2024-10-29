@@ -24,7 +24,7 @@ Make sure you have the following installed:
 Clone the repository:
 
 ```bash
-git clone [https://github.com/yourusername/rust-api-testing-cli.git](https://github.com/akashchekodu/CLI-for-API-Testing)
+git clone [https://github.com/akashchekodu/RequestCLI.git](https://github.com/akashchekodu/RequestCLI)
 cd rust-api-testing-cli
 ```
 
